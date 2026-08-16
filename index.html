@@ -3,127 +3,215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VideoDownloader // 视频下载与转码工具</title>
+<title>VideoDownloader - 视频下载与转码工具</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬇</text></svg>">
 <style>
   :root {
     --cy: #00f0ff;
     --mg: #ff00a0;
     --bg: #05070f;
-    --dim: rgba(0, 240, 255, 0.35);
+    --panel: #070d1c;
+    --line: rgba(0, 240, 255, 0.22);
+    --dim: rgba(0, 240, 255, 0.30);
+    --text: #cfeaff;
+    --muted: #7fa3b8;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    font-family: "Cascadia Code", "Consolas", "Courier New", monospace;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-family: "Cascadia Code", "Consolas", "Microsoft YaHei", monospace;
     background:
-      linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px),
-      radial-gradient(circle at 20% 15%, rgba(255, 0, 160, 0.10), transparent 45%),
-      radial-gradient(circle at 80% 85%, rgba(0, 240, 255, 0.12), transparent 45%),
+      linear-gradient(rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
       var(--bg);
-    background-size: 44px 44px, 44px 44px, 100% 100%, 100% 100%, 100% 100%;
-    color: #cfeaff;
-    overflow: hidden;
+    background-size: 44px 44px;
+    color: var(--text);
+    line-height: 1.7;
   }
-  .card {
-    position: relative;
-    background: rgba(3, 8, 18, 0.88);
-    border: 1px solid var(--cy);
-    box-shadow: 0 0 18px var(--dim), inset 0 0 18px rgba(0, 240, 255, 0.06);
-    padding: 52px 44px;
-    max-width: 600px;
-    width: 90%;
+  a { color: var(--cy); text-decoration: none; }
+
+  /* ===== 顶部导航 ===== */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 58px;
+    background: rgba(5, 7, 15, 0.92);
+    border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(6px);
+  }
+  .logo { font-size: 18px; font-weight: 600; letter-spacing: 2px; color: var(--cy); text-shadow: 0 0 10px var(--dim); }
+  .logo b { color: var(--mg); text-shadow: 0 0 10px rgba(255,0,160,.5); }
+  .navlinks { display: flex; gap: 28px; font-size: 13px; letter-spacing: 1px; }
+  .navlinks a:hover { text-shadow: 0 0 8px var(--cy); }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== Hero ===== */
+  header.hero {
     text-align: center;
-    clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px));
+    padding: 84px 24px 60px;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(circle at 50% 0%, rgba(0,240,255,.10), transparent 60%),
+      radial-gradient(circle at 80% 100%, rgba(255,0,160,.08), transparent 50%);
   }
-  .card::after {
-    content: "";
-    position: absolute;
-    top: -1px; left: -1px;
-    width: 60px; height: 60px;
-    background: linear-gradient(135deg, var(--cy), transparent 70%);
-    mix-blend-mode: screen;
-    filter: blur(1px);
+  .tagline {
+    display: inline-block; font-size: 12px; letter-spacing: 4px;
+    color: var(--mg); border: 1px solid var(--mg);
+    padding: 4px 14px; margin-bottom: 22px;
+    box-shadow: 0 0 12px rgba(255,0,160,.3); text-transform: uppercase;
   }
-  .tag {
-    display: inline-block;
-    border: 1px solid var(--mg);
-    color: var(--mg);
-    padding: 3px 12px;
-    font-size: 13px;
-    letter-spacing: 3px;
-    margin-bottom: 8px;
-    box-shadow: 0 0 10px rgba(255, 0, 160, 0.35);
-    text-transform: uppercase;
+  header.hero h1 {
+    font-size: 46px; letter-spacing: 3px; font-weight: 600; color: var(--cy);
+    text-shadow: 0 0 10px var(--cy), 0 0 30px var(--cy), 0 0 60px var(--cy);
   }
-  h1 {
-    font-size: 34px;
-    letter-spacing: 4px;
-    margin: 6px 0 14px;
-    color: var(--cy);
-    text-shadow: 0 0 8px var(--cy), 0 0 24px var(--cy), 0 0 48px var(--cy);
-    font-weight: 600;
+  header.hero .version {
+    margin-top: 18px; font-size: 14px; letter-spacing: 2px; color: var(--muted);
   }
-  .ver { color: #8affff; font-size: 13px; letter-spacing: 2px; margin-bottom: 22px; }
-  .ver b { color: var(--mg); text-shadow: 0 0 8px rgba(255,0,160,.6); }
-  p.desc { font-size: 14px; line-height: 1.7; opacity: 0.8; margin-bottom: 22px; letter-spacing: 1px; }
-  ul { text-align: left; display: inline-block; font-size: 13px; margin-bottom: 26px; opacity: 0.9; }
-  li { margin: 7px 0; letter-spacing: 1px; }
-  li::marker { color: var(--mg); }
-  .btn {
-    position: relative;
-    display: inline-block;
-    background: transparent;
-    color: var(--cy);
-    border: 1px solid var(--cy);
-    padding: 14px 36px;
-    font-family: inherit;
-    font-size: 16px;
-    letter-spacing: 4px;
-    text-decoration: none;
-    text-transform: uppercase;
+  header.hero .version b { color: var(--mg); }
+  header.hero p { max-width: 620px; margin: 18px auto 30px; font-size: 14px; color: var(--muted); letter-spacing: 1px; }
+  .download-btn {
+    display: inline-block; padding: 15px 42px; font-family: inherit; font-size: 16px;
+    color: var(--cy); background: transparent; border: 1px solid var(--cy);
+    letter-spacing: 4px; text-transform: uppercase;
+    box-shadow: 0 0 14px var(--dim);
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
     transition: all .15s;
-    box-shadow: 0 0 12px var(--dim);
   }
-  .btn:hover {
-    background: var(--cy);
-    color: #05070f;
-    text-shadow: none;
-    box-shadow: 0 0 28px var(--cy);
+  .download-btn:hover { background: var(--cy); color: #05070f; text-shadow: none; box-shadow: 0 0 30px var(--cy); }
+
+  /* ===== 流式区块 ===== */
+  section { padding: 46px 0; border-bottom: 1px solid var(--line); }
+  .sec-head { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; }
+  .sec-head h2 { font-size: 21px; letter-spacing: 2px; color: var(--cy); }
+  .sec-head h2::before { content: "// "; color: var(--mg); }
+  .sec-head .more { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 24px 22px;
+    transition: transform .15s, box-shadow .15s;
   }
-  .btn::after { content: " ▼"; font-size: 12px; }
-  .note { margin-top: 20px; font-size: 11px; opacity: 0.55; letter-spacing: 1px; }
-  .scanline {
-    position: fixed; left: 0; right: 0; top: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, rgba(0,240,255,.5), transparent);
-    animation: scan 6s linear infinite;
+  .card:hover { transform: translateY(-3px); box-shadow: 0 0 20px var(--dim); }
+  .card .ic { font-size: 26px; color: var(--cy); text-shadow: 0 0 12px var(--dim); margin-bottom: 12px; }
+  .card h3 { font-size: 15px; letter-spacing: 1px; margin-bottom: 10px; color: #e8f6ff; }
+  .card h3::after { content: " ▸"; color: var(--mg); }
+  .card p { font-size: 12.5px; color: var(--muted); }
+
+  /* 表格样式区块（新闻式信息条） */
+  .ticker {
+    display: flex; gap: 18px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--line); padding: 18px 22px;
   }
-  @keyframes scan { 0% { top: -4%; } 100% { top: 104%; } }
-  .flicker { animation: fl 4s infinite; }
-  @keyframes fl { 0%,100% { opacity: 1; } 92% { opacity: 1; } 93% { opacity: .4; } 94% { opacity: 1; } 97% { opacity: .7; } 98% { opacity: 1; } }
+  .ticker .item { flex: 1 1 200px; font-size: 13px; letter-spacing: 1px; }
+  .ticker .item b { display: block; color: var(--cy); font-size: 14px; margin-bottom: 4px; }
+  .ticker .item b::before { content: "> "; color: var(--mg); }
+
+  /* ===== 下载区 ===== */
+  #download { text-align: center; }
+  #download .release {
+    display: inline-block; margin-top: 8px; font-size: 12px; color: var(--muted); letter-spacing: 1px;
+  }
+  #download .note { margin-top: 18px; font-size: 12px; color: var(--muted); }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 26px 0;
+    text-align: center;
+    font-size: 12px; color: var(--muted); letter-spacing: 1px;
+  }
+  footer a:hover { text-shadow: 0 0 8px var(--cy); }
 </style>
 </head>
 <body>
-  <div class="scanline"></div>
-  <div class="card">
-    <span class="tag">Net Runner Edition</span>
-    <h1 class="flicker">VIDEOLOADER</h1>
-    <div class="ver">[ SYSTEM <b>0.1.0-alpha</b> ]</div>
-    <p class="desc">Windows 桌面视频下载与转码工具<br>单文件免安装 · 基于 yt-dlp 与 ffmpeg</p>
-    <ul>
-      <li>LINK_INPUT ▸ 粘贴链接一键下载，支持多任务并行与播放列表展开</li>
-      <li>TRANSCODE ▸ 本地转码 MP4 / MKV / WEBM / MOV，CPU / GPU 硬件加速</li>
-      <li>COOKIE ▸ 复用浏览器登录态，可下载会员 / 登录后内容</li>
-      <li>PROXY ▸ HTTP(S) / SOCKS5 代理支持与网络连通测试</li>
-    </ul>
-    <a class="btn" href="https://nanaoka0.github.io/VideoDownloader.exe" download>下载</a>
-    <div class="note">&gt;_ 依赖工具（ffmpeg / ffprobe / yt-dlp）首次运行时在软件「设置 - 依赖检测」中下载</div>
-  </div>
+  <!-- 导航 -->
+  <nav>
+    <div class="logo">Video<b>Downloader</b></div>
+    <div class="navlinks">
+      <a href="#features">功能</a>
+      <a href="#usage">使用</a>
+      <a href="#download">下载</a>
+      <a href="https://github.com/Nanaoka0" target="_blank">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="tagline">Net Runner Edition</div>
+    <h1>VideoDownloader</h1>
+    <div class="version">CURRENT RELEASE <b>[ 0.1.0-alpha ]</b></div>
+    <p>Windows 桌面视频下载与转码工具，单文件免安装，基于 yt-dlp 与 ffmpeg。</p>
+    <a class="download-btn" href="#download" data-dl="https://nanaoka0.github.io/VideoDownloader.exe" onclick="event.preventDefault();location.href=this.getAttribute('data-dl')">下载</a>
+  </header>
+
+  <!-- 新闻式信息条 -->
+  <section>
+    <div class="wrap">
+      <div class="sec-head"><h2>速览</h2><span class="more">UPDATE 2026-08</span></div>
+      <div class="ticker">
+        <div class="item"><b>视频下载</b>粘贴链接一键下载，多任务并行，播放列表自动展开</div>
+        <div class="item"><b>视频转码</b>MP4 / MKV / WEBM / MOV 输出，CPU 或 GPU 硬件加速</div>
+        <div class="item"><b>登录态 Cookie</b>复用浏览器会话，可下载会员 / 登录后内容</div>
+        <div class="item"><b>代理支持</b>HTTP(S) / SOCKS5，B站 / YouTube 可单独绕过</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 功能卡片 -->
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head"><h2>功能</h2></div>
+      <div class="cards">
+        <div class="card">
+          <div class="ic">▸</div>
+          <h3>批量下载</h3>
+          <p>支持 1-8 个任务并行下载，断点续传，格式 / 分辨率 / HDR 可选，完成后自动打开输出文件夹。</p>
+        </div>
+        <div class="card">
+          <div class="ic">▣</div>
+          <h3>格式解析</h3>
+          <p>异步解析视频格式列表，一键批量切换全局分辨率，优先帧率与 HDR 偏好。</p>
+        </div>
+        <div class="card">
+          <div class="ic">⚙</div>
+          <h3>本地转码</h3>
+          <p>多容器与编码矩阵（H.264 / HEVC / VP9 / AV1），自动识别 ffmpeg 可用编码器，支持停止 / 删除任务。</p>
+        </div>
+        <div class="card">
+          <div class="ic">⌁</div>
+          <h3>硬件感知</h3>
+          <p>自动检测 NVIDIA 驱动版本，下载 ffmpeg 时选择兼容构建，避免 NVENC 驱动版本不匹配。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 使用说明 -->
+  <section id="usage">
+    <div class="wrap">
+      <div class="sec-head"><h2>使用方法</h2></div>
+      <div class="ticker">
+        <div class="item"><b>第一步</b>在「设置 - 依赖检测」下载安装 yt-dlp 与 ffmpeg</div>
+        <div class="item"><b>第二步</b>下载页粘贴视频链接，选择清晰度后开始下载</div>
+        <div class="item"><b>第三步</b>会员内容先在浏览器登录，再到设置选择「Cookie 来源」</div>
+        <div class="item"><b>第四步</b>转码页添加本地文件，选择容器 / 编码后一键转换</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 下载 -->
+  <section id="download">
+    <div class="wrap">
+      <a class="download-btn" href="https://nanaoka0.github.io/VideoDownloader.exe" download>下载 VideoDownloader.exe</a>
+      <div class="release">RELEASE 0.1.0-alpha · 单文件 exe · 约 24MB · 内嵌 .NET 9 运行时</div>
+      <div class="note">&gt;_ 依赖工具（ffmpeg / ffprobe / yt-dlp）首次运行时在软件「设置 - 依赖检测」中自动下载</div>
+    </div>
+  </section>
+
+  <footer>
+    VideoDownloader © 2026 · 基于 yt-dlp 与 ffmpeg · <a href="https://github.com/Nanaoka0" target="_blank">GitHub</a>
+  </footer>
 </body>
 </html>
