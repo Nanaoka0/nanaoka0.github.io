@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoDownloader - 视频下载与转码工具</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⬇</text></svg>">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+  }
+  .card {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 48px 40px;
+    max-width: 560px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  h1 { font-size: 30px; margin-bottom: 12px; }
+  .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  p { line-height: 1.7; opacity: 0.95; margin-bottom: 28px; font-size: 15px; }
+  .btn {
+    display: inline-block;
+    background: #fff;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 17px;
+    padding: 14px 32px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.28); }
+  .note { margin-top: 18px; font-size: 12px; opacity: 0.75; }
+  ul { text-align: left; display: inline-block; font-size: 14px; margin-bottom: 24px; opacity: 0.95; }
+  li { margin: 6px 0; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>⬇ VideoDownloader</h1>
+    <div class="badge">当前版本 0.1.0-alpha</div>
+    <p>Windows 桌面视频下载与转码工具，单文件免安装，基于 yt-dlp 与 ffmpeg。</p>
+    <ul>
+      <li>✔ 粘贴链接一键下载，支持多任务并行与播放列表展开</li>
+      <li>✔ 本地视频转码（MP4 / MKV / WEBM / MOV，CPU 或 GPU 硬件加速）</li>
+      <li>✔ Cookie 登录态复用，可下载会员 / 登录后内容</li>
+      <li>✔ HTTP(S) / SOCKS5 代理支持与网络连通测试</li>
+    </ul>
+    <a class="btn" href="https://nanaoka0.github.io/VideoDownloader.exe" download>下载 VideoDownloader.exe</a>
+    <div class="note">单文件免安装，直接点击下载即可运行。依赖工具（ffmpeg / ffprobe / yt-dlp）首次运行时在软件「设置 - 依赖检测」中自动下载。</div>
+  </div>
+</body>
+</html>
